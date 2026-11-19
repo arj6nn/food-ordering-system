@@ -1,9 +1,12 @@
 
+import dotenv from "dotenv";
 import express from "express";
+import connectDB from "./config/db.js";
+import userRoutes from "./routes/user.routes.js";
+
+dotenv.config();
 
 const app = express();
-
-const PORT = 5001;
 
 app.use(express.json());
 
@@ -15,17 +18,18 @@ app.get("/health", (req, res) => {
   res.json({
     status: "success",
     service: "user-service",
-    message: "User service is healthy"
+    message: "User service is healthy",
   });
 });
 
-app.get("/users", (req, res) => {
-  res.json({
-    message: "Users fetched successfully",
-    users: []
-  });
-});
+app.use("/users", userRoutes);
 
-app.listen(PORT, () => {
-  console.log(`User Service running on port ${PORT}`);
-});
+const startServer = async () => {
+  await connectDB();
+
+  app.listen(process.env.PORT || 5001, () => {
+    console.log("User Service running");
+  });
+};
+
+startServer();
